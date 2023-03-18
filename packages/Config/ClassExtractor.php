@@ -18,7 +18,7 @@ final class ClassExtractor
      * @var string
      * @see https://regex101.com/r/1IpNtV/3
      */
-    private const STATIC_CALL_CLASS_REGEX = '#(?<quote>["\']?)[\\\\]*(?<class_name>[A-Za-z][\\w\\\\]+)::#';
+    private const STATIC_CALL_CLASS_REGEX = '#(?<quote>["\']?)[\\\\]*(?<env>%env.)?(?<class_name>[A-Za-z][\\w\\\\]+)::#';
     /**
      * @var string
      */
@@ -54,6 +54,9 @@ final class ClassExtractor
         }
         $staticCallsMatches = Strings::matchAll($fileContent, self::STATIC_CALL_CLASS_REGEX);
         foreach ($staticCallsMatches as $staticCallMatch) {
+            if (isset($staticCallMatch['env']) && $staticCallMatch['env']) {
+                continue;
+            }
             $classNames[] = $this->extractClassName($fileInfo, $staticCallMatch);
         }
         return $classNames;
